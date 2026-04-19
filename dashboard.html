@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DASHBOARD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+            text-align:center;
+        }
+
+        .top-right{
+            position:absolute;
+            top:15px;
+            right:20px;
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+        }
+
+        .top-btn{
+            padding:10px 15px;
+            background:#22c55e;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:bold;
+            text-transform:uppercase;
+        }
+
+        .friend-list-btn{
+            background:#14b8a6;
+        }
+
+        .logout-btn{
+            background:#ef4444 !important;
+        }
+
+        .top-bar{
+            display:flex;
+            align-items:center;
+            padding:15px 20px;
+        }
+
+        .profile{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            cursor:pointer;
+        }
+
+        .profile-circle{
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background:white;
+            color:black;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-weight:bold;
+            font-size:20px;
+            overflow:hidden;
+        }
+
+        .username-top{
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        h1{
+            margin-top:60px;
+            font-size:42px;
+            letter-spacing:4px;
+        }
+
+        .welcome-user{
+            margin-top:8px;
+            font-size:22px;
+            color:#cbd5e1;
+        }
+
+        .btn-rows{
+            margin-top:60px;
+            display:flex;
+            flex-direction:column;
+            gap:30px;
+            align-items:center;
+        }
+
+        .row{
+            display:flex;
+            gap:40px;
+        }
+
+        .btn{
+            width:260px;
+            padding:18px 0;
+            font-size:22px;
+            font-weight:bold;
+            border-radius:10px;
+            text-decoration:none;
+            color:white;
+            transition:0.3s;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
+            text-transform:uppercase;
+        }
+
+        .send{ background:#e53935; }
+        .receive{ background:#00acc1; }
+        .vote{ background:#8b5cf6; }
+        .extra{ background:#f59e0b; }
+
+        .btn:hover{
+            transform:scale(1.06);
+        }
+
+        @media(max-width:650px){
+            .row{
+                flex-direction:column;
+                gap:20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top-right">
+    <div class="top-btn" onclick="goAddFriend()">ADD FRIEND</div>
+    <div class="top-btn friend-list-btn" onclick="goFriendList()">FRIEND LIST</div>
+    <div class="top-btn logout-btn" onclick="logout()">LOGOUT</div>
+</div>
+
+<div class="top-bar">
+    <div class="profile" onclick="goProfile()">
+        <div class="profile-circle" id="profileCircle">U</div>
+        <div class="username-top" id="usernameTop">Loading...</div>
+    </div>
+</div>
+
+<h1>WELCOME</h1>
+<div class="welcome-user" id="usernameBelow">Loading...</div>
+
+<div class="btn-rows">
+    <div class="row">
+        <a href="send.html" class="btn send">SEND NOTES</a>
+        <a href="receive.html" class="btn receive">RECEIVE NOTES</a>
+    </div>
+    <div class="row">
+        <a href="vote.html" class="btn vote">VOTE HOUSE</a>
+        <a href="youruploads.html" class="btn extra">UPLOAD BY YOU</a>
+    </div>
+</div>
+
+<script>
+    // Firebase initialization
+    const firebaseConfig = {
+        apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+        authDomain: "school-project-7beb3.firebaseapp.com",
+        databaseURL: "https://school-project-7beb3-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "school-project-7beb3",
+        storageBucket: "school-project-7beb3.firebasestorage.app",
+        messagingSenderId: "846563976783",
+        appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Load user data
+    window.onload = function() {
+        const scs = localStorage.getItem("currentUser");
+        if (!scs) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        // Load from Firestore
+        db.collection("users").doc(scs).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById("usernameTop").innerText = data.username || scs;
+                document.getElementById("usernameBelow").innerText = data.username || scs;
+                document.getElementById("profileCircle").innerText = (data.username || scs).charAt(0).toUpperCase();
+            } else {
+                document.getElementById("usernameTop").innerText = scs;
+                document.getElementById("usernameBelow").innerText = scs;
+                document.getElementById("profileCircle").innerText = scs.charAt(0).toUpperCase();
+            }
+        });
+    }
+
+    function goProfile(){
+        window.location.href = "profile.html";
+    }
+
+    function goAddFriend(){
+        window.location.href = "addfriend.html";
+    }
+
+    function goFriendList(){
+        window.location.href = "friends.html";
+    }
+
+    function logout(){
+        localStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>

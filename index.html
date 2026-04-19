@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Firebase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="firebase-config.js"></script>
+    <style>/* Your existing CSS same */</style>
+</head>
+<body>
+<div class="login-box">
+    <h2>Login / Sign Up</h2>
+    <input type="text" id="scs" placeholder="Enter SCS Number">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="firebaseLogin()">Continue</button>
+</div>
+
+<script type="module">
+import { auth } from './firebase-config.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+window.firebaseLogin = async () => {
+    const scs = document.getElementById('scs').value;
+    const password = document.getElementById('password').value;
+    const email = `${scs}@school.com`;
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        localStorage.setItem('currentUser', scs);
+        window.location.href = 'dashboard.html';
+    } catch {
+        // Auto signup
+        await createUserWithEmailAndPassword(auth, email, password);
+        localStorage.setItem('currentUser', scs);
+        window.location.href = 'dashboard.html';
+    }
+};
+</script>
+</body>
+</html>
